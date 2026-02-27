@@ -1,61 +1,89 @@
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import { createElement, Fragment } from "react";
+import { useState } from "react";
+import styles from "./app.module.css";
 
-function App() {
-	const currentYear = new Date().getFullYear();
+export const App = () => {
+	const [value, setValue] = useState("");
+	const [list, setList] = useState([]);
+	const [error, setError] = useState("");
 
-	const logos = createElement(
-		"div",
-		null,
-		createElement(
-			"a",
-			{ href: "https://vite.dev", target: "_blank" },
-			createElement("img", {
-				src: viteLogo,
-				className: "logo",
-				alt: "Vite logo",
-			}),
-		),
-		createElement(
-			"a",
-			{ href: "https://react.dev", target: "_blank" },
-			createElement("img", {
-				src: reactLogo,
-				className: "logo",
-				alt: "React logo",
-			}),
-		),
+	let isValueValid = value.length >= 3;
+
+	const onInputButtonClick = () => {
+		const promptValue = prompt("Введите значение");
+
+		if (!promptValue || promptValue.length < 3) {
+			setError("Введенное значение должно содержать минимум 3 символа");
+			return;
+		}
+
+		setValue(promptValue.trim());
+		setError("");
+	};
+
+	const onAddButtonClick = () => {
+		if (value?.length >= 3) {
+			const date = new Date();
+			const id = date.getTime();
+			const dateString =
+				date.toISOString().substring(0, 10) +
+				" " +
+				date.toISOString().substring(11, 19);
+
+			setList((list) => [...list, { id, value, dateString }]);
+
+			setValue("");
+			setError("");
+		}
+	};
+
+	return (
+		<>
+			<div className={styles.app}>
+				<h1 className={styles["page-heading"]}>Ввод значения</h1>
+				<p className={styles["no-margin-text"]}>
+					Текущее значение <code>value</code>: "
+					<output className={styles["current-value"]}>{value}</output>
+					"
+				</p>
+
+				{error !== "" && (
+					<div className={styles.error}>
+						Введенное значение должно содержать минимум 3 символа
+					</div>
+				)}
+				<div className={styles["buttons-container"]}>
+					<button
+						className={styles.button}
+						onClick={onInputButtonClick}
+					>
+						Ввести новое
+					</button>
+					<button
+						className={styles.button}
+						onClick={onAddButtonClick}
+						disabled={!isValueValid}
+					>
+						Добавить в список
+					</button>
+				</div>
+				<div className={styles["list-container"]}>
+					<h2 className={styles["list-heading"]}>Список:</h2>
+
+					{list.length === 0 && (
+						<p className={styles["no-margin-text"]}>
+							Нет добавленных элементов
+						</p>
+					)}
+
+					<ul className={styles.list}>
+						{list.map(({ id, value, dateString }) => (
+							<li className={styles["list-item"]} key={id}>
+								{value + " - " + dateString}
+							</li>
+						))}
+					</ul>
+				</div>
+			</div>
+		</>
 	);
-
-	const title = createElement("h1", null, null);
-
-	const card = createElement(
-		"div",
-		{ className: "card" },
-		createElement(
-			"p",
-			null,
-			"Edit <code>src/App.jsx</code> and save to test HMR",
-		),
-	);
-
-	const docs = createElement(
-		"div",
-		{ className: "read-the-docs" },
-		"Click on the Vite and React logos to learn more",
-	);
-
-	const app = createElement(Fragment, null, [
-		logos,
-		title,
-		currentYear,
-		card,
-		docs,
-	]);
-
-	return app;
-}
-
-export default App;
+};
