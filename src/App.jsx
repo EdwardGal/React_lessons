@@ -1,74 +1,110 @@
 import { useState } from "react";
 import styles from "./app.module.css";
-import data from "./data.json";
 
 export const App = () => {
-	const steps = data;
-	const [activeIndex, setActiveIndex] = useState(0);
-	const lastIndex = steps.length - 1;
+	const [operand1, setOperand1] = useState("");
+	const [operator, setOperator] = useState("");
+	const [operand2, setOperand2] = useState("");
+	const [sum, setSum] = useState(null);
+	const [isSecondOperand, setIsSecondOperand] = useState(false);
 
-	const clickOnButtonNext = () => {
-		if (activeIndex === lastIndex) {
-			setActiveIndex(0);
+	const NUMS = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0"];
+	const SYMBOLS = ["C", "+", "-", "="];
+
+	const checkSymbolOnEquals = operator === "=";
+
+	const calcSum = (currentOperator) => {
+		const oper1 = Number(operand1);
+		const oper2 = Number(operand2);
+
+		switch (currentOperator) {
+			case "+":
+				setSum(oper1 + oper2);
+				break;
+			case "-":
+				setSum(oper1 - oper2);
+				break;
+			default:
+				break;
+		}
+	};
+
+	const onDigitHandler = (digit) => {
+		if (!isSecondOperand) {
+			setOperand1((prev) => prev + digit);
+		} else {
+			setOperand2((prev) => prev + digit);
+		}
+	};
+
+	const onSymbolHandler = (symbol) => {
+		if (!operand1) return;
+
+		if (symbol === "C") {
+			setOperand1("");
+			setOperand2("");
+			setOperator("");
+			setSum(null);
+			setIsSecondOperand(false);
 			return;
 		}
-		setActiveIndex(activeIndex + 1);
-	};
 
-	const clickOnButtonPrev = () => {
-		if (activeIndex > 0) {
-			setActiveIndex(activeIndex - 1);
+		if (symbol === "=") {
+			if (!operand2) return;
+			calcSum(operator);
+			setOperator(symbol);
+			setIsSecondOperand(false);
+			return;
 		}
-	};
 
-	const clickOnButtonStep = (stepIndex) => {
-		setActiveIndex(stepIndex);
+		if (sum !== null) {
+			setOperand1(sum);
+			setOperand2("");
+			setSum(null);
+		}
+
+		setOperator(symbol);
+		setIsSecondOperand(true);
 	};
 
 	return (
-		<div className={styles.container}>
-			<div className={styles.card}>
-				<h1>Инструкция по готовке пельменей</h1>
-				<div className={styles.steps}>
-					<div className={styles["steps-content"]}>
-						{steps[activeIndex]?.content}
-					</div>
-					<ul className={styles["steps-list"]}>
-						{steps.map((step, stepIndex) => (
-							<li
-								className={`
-									${styles["steps-item"]}
-									${stepIndex < activeIndex ? styles.done : ""}
-									${stepIndex === activeIndex ? styles.active : ""}
-								`}
-								key={step.id}
+		<div className={styles.calculator}>
+			<div className={styles.calculator__content}>
+				<div className={styles.calculator__screen}>
+					<span
+						className={`${styles["calculator__screen-count"]} ${
+							checkSymbolOnEquals ? styles.active : ""
+						}`}
+					>
+						{checkSymbolOnEquals
+							? sum
+							: operand1 + operator + operand2}
+					</span>
+				</div>
+
+				<div className={styles.calculator__inner}>
+					<div className={styles.calculator__nums}>
+						{NUMS.map((item) => (
+							<div
+								className={styles.calculator__item}
+								key={item}
+								onClick={() => onDigitHandler(item)}
 							>
-								<button
-									className={styles["steps-item-button"]}
-									onClick={() => clickOnButtonStep(stepIndex)}
-								>
-									{stepIndex + 1}
-								</button>
-								{step.title}
-							</li>
+								{item}
+							</div>
 						))}
-					</ul>
-					<div className={styles["buttons-container"]}>
-						<button
-							className={styles.button}
-							onClick={clickOnButtonPrev}
-							disabled={activeIndex === 0}
-						>
-							Назад
-						</button>
-						<button
-							className={styles.button}
-							onClick={clickOnButtonNext}
-						>
-							{activeIndex < lastIndex
-								? "Далее"
-								: "Начать сначала"}
-						</button>
+					</div>
+
+					<div className={styles.calculator__symbols}>
+						{SYMBOLS.map((item) => (
+							<div
+								className={styles.calculator__item}
+								key={item}
+								onClick={() => onSymbolHandler(item)}
+							>
+								{item}
+							</div>
+						))}
 					</div>
 				</div>
 			</div>
