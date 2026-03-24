@@ -2,21 +2,10 @@ import styles from "./information.module.css";
 import PropTypes from "prop-types";
 
 export const InformationLayout = ({
-	currentPlayer,
-	isGameEnded,
-	isDraw,
+  message,
 }) => {
-	let status;
 
-	if (isDraw) {
-		status = "Ничья";
-	} else if (isGameEnded) {
-		status = `Победа: ${currentPlayer}`;
-	} else {
-		status = `Ходит: ${currentPlayer}`;
-	}
-
-	return <div className={styles.information__title}>{status}</div>;
+  return <div className={styles.information__title}>{message}</div>;
 };
 
 InformationLayout.propTypes = {

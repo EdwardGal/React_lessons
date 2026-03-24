@@ -3,12 +3,16 @@ import { Field } from "../Field/Field";
 import PropTypes from "prop-types";
 
 export const GameLayout = ({ currentPlayer, isGameEnded, isDraw, ...rest }) => {
+
+  const message = isDraw ? "Ничья" : isGameEnded ? `Победа: ${currentPlayer}` : `Ходит: ${currentPlayer}`;
+
   return (
     <>
       <Information
         currentPlayer={currentPlayer}
         isGameEnded={isGameEnded}
         isDraw={isDraw}
+        message={message}
       />
       <Field
         currentPlayer={currentPlayer}
