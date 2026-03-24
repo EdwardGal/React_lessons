@@ -1,6 +1,16 @@
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { App } from "./App";
+import styles from "./game.module.css";
+import { Game } from "./Game.jsx";
 
-const root = createRoot(document.body);
-root.render(<App />);
+const rootElement = document.getElementById("game");
+rootElement.className = styles.app;
+
+const root = createRoot(rootElement);
+
+root.render(
+	<StrictMode>
+		<Game />
+	</StrictMode>,
+);

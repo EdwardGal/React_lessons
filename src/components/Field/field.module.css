@@ -1,0 +1,15 @@
+.field {
+	width: 100%;
+	margin-bottom: 20px;
+}
+
+.field__items {
+	display: flex;
+	flex-wrap: wrap;
+
+}
+
+.field__item {
+	flex: 0 0 calc(100% / 3);
+	height: 48px;
+}
