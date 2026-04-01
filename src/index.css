@@ -1,11 +1,10 @@
-body {
-	margin: 0;
+* {
 	padding: 0;
-	height: 100vh;
-	line-height: 1;
+	margin: 0;
 	box-sizing: border-box;
+	line-height: 1;
 }
 
-button{
-	cursor: pointer;
+body {
+	height: 100vh;
 }
