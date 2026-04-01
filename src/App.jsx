@@ -1,105 +1,106 @@
-import { useRef, useState } from "react";
 import styles from "./app.module.css";
+import { useState, useRef, useEffect } from "react";
 
-const EMAIL_REGEX =
-	/^(?!.*\.\.)([A-Za-z0-9._%+-]+)@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/;
-const PASSWORD_REGEX = /^[A-Za-z0-9]+$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
-const initialFormData = {
-	email: "",
-	password: "",
-	confirmPassword: "",
+const initialState = {
+  email: "",
+  password: "",
+  confirmPassword: "",
 };
 
 export const App = () => {
-	const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState(initialState);
+  const [error, setError] = useState(null);
+  const buttonRef = useRef(null);
 
-	const [error, setError] = useState(null);
 
-	const emailRef = useRef(null);
-	const passwordRef = useRef(null);
-	const confirmPasswordRef = useRef(null);
 
-	const hasEmptyField = Object.values(formData).some((value) => value === "");
+  const isFormValid = !error && formData.email &&
+    formData.password &&
+    formData.confirmPassword === formData.password
 
-	const formReset = () => {
-		setFormData(initialFormData);
-	};
 
-	const errorAndFocusHandler = (message, ref) => {
-		setError(message);
-		ref.current.focus();
-	};
+  useEffect(() => {
+    if (isFormValid) {
+      buttonRef.current.focus();
+    }
+  }, [isFormValid]);
 
-	const onSubmit = (e) => {
-		e.preventDefault();
-		setError(null);
 
-		if (!EMAIL_REGEX.test(formData.email)) {
-			errorAndFocusHandler("Некорректно введен email", emailRef);
-			return;
-		}
 
-		if (!PASSWORD_REGEX.test(formData.password)) {
-			errorAndFocusHandler(
-				"Пароль должен содержать только цифры и буквы",
-				passwordRef,
-			);
-			return;
-		}
-		if (formData.password.length < 4) {
-			errorAndFocusHandler(
-				"Длина пароля должна быть больше 3 символов",
-				passwordRef,
-			);
-			return;
-		}
+  const onSubmitHandler = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    setError(null);
+    setFormData(initialState);
+  }
 
-		if (formData.password !== formData.confirmPassword) {
-			errorAndFocusHandler("Пароли не совпадают", confirmPasswordRef);
-			return;
-		}
+  const onChangeHandler = ({ target }) => {
+    const { name, value } = target;
+    setFormData(prev => ({ ...prev, [name]: value }));
 
-		console.log(formData);
+    let errorMessage = null;
 
-		formReset();
-	};
+    if (name === "email" && !EMAIL_REGEX.test(value)) {
+      errorMessage = "Некорректный email";
+    }
 
-	const onChangeHandler = ({ target }) => {
-		const { name, value } = target;
-		setFormData((prev) => ({ ...prev, [name]: value }));
-	};
+    if (name === "password") {
+      if (!PASSWORD_REGEX.test(value)) {
+        errorMessage = "Пароль должен содержать хотя бы одну латинскую букву, цифру и быть не менее 8 символов";
+      } else if (
+        formData.confirmPassword &&
+        value !== formData.confirmPassword
+      ) {
+        errorMessage = "Пароли не совпадают";
+      }
+    }
+    if (name === "confirmPassword" && value !== formData.password) {
+      errorMessage = "Пароли не совпадают";
+    }
 
-	return (
-		<form className={styles.form} onSubmit={onSubmit}>
-			{error && <div className={styles.form__error}>{error}</div>}
-			<input
-				ref={emailRef}
-				type="email"
-				placeholder="Введите Ваш email"
-				name="email"
-				value={formData.email}
-				onChange={onChangeHandler}
-			></input>
-			<input
-				ref={passwordRef}
-				type="password"
-				placeholder="Введите пароль"
-				name="password"
-				value={formData.password}
-				onChange={onChangeHandler}
-			></input>
-			<input
-				ref={confirmPasswordRef}
-				type="password"
-				placeholder="Подтвердите пароль"
-				name="confirmPassword"
-				value={formData.confirmPassword}
-				onChange={onChangeHandler}
-			></input>
-			<button type="submit" disabled={hasEmptyField}>
-				Зарегистрироваться
-			</button>
-		</form>
-	);
+    setError(errorMessage);
+  };
+
+
+
+  return (
+    <form className={styles.form} onSubmit={onSubmitHandler}>
+      {error && <div className={styles.form__error}>{error}</div>}
+      <input
+        className={styles.form__input}
+        type="email"
+        name="email"
+        value={formData.email}
+        placeholder="Введите email"
+        onChange={onChangeHandler}
+      />
+      <input
+        className={styles.form__input}
+        type="password"
+        name="password"
+        value={formData.password}
+        placeholder="Введите пароль"
+        onChange={onChangeHandler}
+      />
+      <input
+        className={styles.form__input}
+        type="password"
+        name="confirmPassword"
+        value={formData.confirmPassword}
+        placeholder="Подтвердите пароль"
+        onChange={onChangeHandler}
+      />
+      <button
+        ref={buttonRef}
+        className={styles.form__btn}
+        type="submit"
+        disabled={!isFormValid}
+      >
+        Зарегистрироваться
+      </button>
+    </form>
+  );
 };
