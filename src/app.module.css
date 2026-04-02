@@ -10,22 +10,16 @@
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	gap: 10px;
 }
 
 .form__error {
 	color: red;
-	margin-bottom: 20px;
 }
 
 .form__input {
 	width: 100%;
 	padding: 5px;
-}
-
-.form__input_error {
-	border: 1px solid red;
 }
 
 .form__btn {
