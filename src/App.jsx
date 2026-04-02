@@ -1,5 +1,8 @@
 import styles from "./app.module.css";
-import { useState, useRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+import { useRef, useEffect } from "react";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
@@ -10,94 +13,66 @@ const initialState = {
   confirmPassword: "",
 };
 
+const schema = yup.object().shape({
+  email: yup.string().matches(EMAIL_REGEX, "Некорректный email"),
+  password: yup.string().matches(PASSWORD_REGEX, "Пароль должен содержать хотя бы одну латинскую букву, цифру и быть не менее 8 символов").max(16, "Пароль должен содержать не более 16 символов"),
+  confirmPassword: yup.string().oneOf([yup.ref("password"), null], "Пароли не совпадают"),
+});
+
 export const App = () => {
-  const [formData, setFormData] = useState(initialState);
-  const [error, setError] = useState(null);
+  const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({
+    resolver: yupResolver(schema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+    defaultValues: initialState,
+  });
+
   const buttonRef = useRef(null);
 
-
-
-  const isFormValid = !error && formData.email &&
-    formData.password &&
-    formData.confirmPassword === formData.password
-
-
   useEffect(() => {
-    if (isFormValid) {
-      buttonRef.current.focus();
+    if (isValid) {
+      buttonRef.current?.focus();
     }
-  }, [isFormValid]);
+  }, [isValid]);
 
-
-
-  const onSubmitHandler = (e) => {
-    e.preventDefault();
+  const onSubmit = (formData) => {
     console.log(formData);
-    setError(null);
-    setFormData(initialState);
+    reset();
   }
 
-  const onChangeHandler = ({ target }) => {
-    const { name, value } = target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    let errorMessage = null;
-
-    if (name === "email" && !EMAIL_REGEX.test(value)) {
-      errorMessage = "Некорректный email";
-    }
-
-    if (name === "password") {
-      if (!PASSWORD_REGEX.test(value)) {
-        errorMessage = "Пароль должен содержать хотя бы одну латинскую букву, цифру и быть не менее 8 символов";
-      } else if (
-        formData.confirmPassword &&
-        value !== formData.confirmPassword
-      ) {
-        errorMessage = "Пароли не совпадают";
-      }
-    }
-    if (name === "confirmPassword" && value !== formData.password) {
-      errorMessage = "Пароли не совпадают";
-    }
-
-    setError(errorMessage);
-  };
-
-
-
   return (
-    <form className={styles.form} onSubmit={onSubmitHandler}>
-      {error && <div className={styles.form__error}>{error}</div>}
+    <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+      {Object.values(errors)?.map((err) =>
+        <div key={err.message} className={styles.form__error}>
+          {err.message}
+        </div>
+      )}
       <input
         className={styles.form__input}
         type="email"
         name="email"
-        value={formData.email}
         placeholder="Введите email"
-        onChange={onChangeHandler}
+        {...register("email")}
       />
       <input
         className={styles.form__input}
         type="password"
         name="password"
-        value={formData.password}
         placeholder="Введите пароль"
-        onChange={onChangeHandler}
+        {...register("password")}
       />
       <input
         className={styles.form__input}
         type="password"
         name="confirmPassword"
-        value={formData.confirmPassword}
         placeholder="Подтвердите пароль"
-        onChange={onChangeHandler}
+        {...register("confirmPassword")}
       />
       <button
         ref={buttonRef}
         className={styles.form__btn}
         type="submit"
-        disabled={!isFormValid}
+        disabled={!isValid}
       >
         Зарегистрироваться
       </button>
