@@ -1,19 +1,76 @@
 .app {
 	display: flex;
+	flex-direction: column;
+	gap: 20px;
 	justify-content: center;
 	align-items: center;
 	height: 100%;
 }
 
 .todos {
+	max-width: 600px;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	background: lightcyan;
+	border-radius: 12px 12px 0 0;
+	overflow: hidden;
+}
+
+.todos__actions {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
+	padding: 10px;
+	background: lightsalmon;
+}
+
+.todos__action{
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+}
+
+.todos__label{
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.todos__list {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding: 10px;
 }
 
 .todos__item {
 	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	gap: 10px;
+	padding: 5px;
+}
+
+.todos__title {
+	flex: 1 1 auto;
+	padding: 5px;
+}
+
+.todos__checkbox {
+	flex-shrink: 0;
+}
+
+.todos__item:not(.todos__item_completed):hover {
+	background: lightblue;
+}
+
+.todos__item:not(.todos__item_completed):hover .todos__title {
+	outline: 1px solid black;
+}
+
+.todos__item_completed .todos__title {
+	text-decoration: line-through;
 }
 
 .todos__error {
