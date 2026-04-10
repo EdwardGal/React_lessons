@@ -1,136 +1,98 @@
-import { useState } from "react";
-import { BASE_URL } from "../constants";
+import { useEffect, useState } from "react";
+import {
+	ref,
+	onValue,
+	get,
+	push,
+	update,
+	remove,
+	query,
+	orderByChild,
+	startAt,
+	endAt,
+} from "firebase/database";
+import { db } from "../firebase";
 
-const checkResponseStatus = (response) => {
-	if (!response.ok) {
-		throw new Error(`Ошибка: ${response.status}`);
-	}
-
-	return response;
+const dbREfHandler = (url) => {
+	const todosDbRef = ref(db, url);
+	return todosDbRef;
 };
 
+
 export const useTodos = () => {
-	const [todos, setTodos] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
+	const [todos, setTodos] = useState({});
+	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 
-	const getTodos = async () => {
-		try {
-			setIsLoading(true);
-			const response = await fetch(`${BASE_URL}/todos`);
-			checkResponseStatus(response);
+	useEffect(() => {
+		return onValue(dbREfHandler("todos"), (snapshot) => {
+			const data = snapshot.val() || {};
+			const loadedTodos = Object.entries(data);
 
-			const data = await response.json();
-			setTodos(data);
-		} catch (error) {
-			setError(error.message);
-		} finally {
+			setTodos(loadedTodos);
 			setIsLoading(false);
-		}
-	};
+		});
+	}, []);
 
-	const addTodos = async (newTodo) => {
+	const addTodos = (newTodo) => {
 		if (!newTodo) return;
-
-		try {
-			const response = await fetch(`${BASE_URL}/todos`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					title: newTodo,
-					completed: false,
-				}),
-			});
-
-			checkResponseStatus(response);
-
-			const data = await response.json();
-
-			setTodos((prev) => [...prev, data]);
-		} catch (error) {
-			setError(error.message);
-		}
+		push(dbREfHandler("todos"), {
+			title: newTodo,
+			completed: false,
+		});
 	};
 
-	const updateTodos = async (id, value) => {
+	const updateTodos = (id, value) => {
 		const updatedItem =
 			typeof value === "boolean"
 				? { completed: Boolean(!value) }
 				: { title: value };
 
-		try {
-			const response = await fetch(`${BASE_URL}/todos/${id}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(updatedItem),
-			});
-			checkResponseStatus(response);
-
-			const data = await response.json();
-
-			setTodos((prev) =>
-				prev.map((todo) =>
-					todo.id === id ? { ...todo, ...data } : todo,
-				),
-			);
-		} catch (error) {
-			setError(error.message);
-		}
+		update(dbREfHandler(`todos/${id}`), updatedItem);
 	};
 
-	const deleteTodos = async (id) => {
-		try {
-			const response = await fetch(`${BASE_URL}/todos/${id}`, {
-				method: "DELETE",
-			});
-			checkResponseStatus(response);
-
-			setTodos((prev) => prev.filter((todo) => todo.id !== id));
-		} catch (error) {
-			setError(error.message);
-		}
+	const deleteTodos = (id) => {
+		remove(dbREfHandler(`todos/${id}`))
 	};
 
 	const sortTodos = async () => {
-		try {
-			const response = await fetch(`${BASE_URL}/todos?_sort=title`);
-			checkResponseStatus(response);
+		const q = query(dbREfHandler("todos"), orderByChild("title"));
+		const snapshot = await get(q);
+		const loadedTodos = [];
+		snapshot.forEach((child) => {
+			loadedTodos.push([child.key, child.val()]);
+		});
 
-			const data = await response.json();
-
-			setTodos(data);
-		} catch (error) {
-			setError(error.message);
-		}
+		setTodos(loadedTodos);
 	};
 
-	const serchTodos = async (query) => {
-		const url = query?.trim()
-			? `${BASE_URL}/todos?title=${query}`
-			: `${BASE_URL}/todos`;
+	const searchTodos = async (text) => {
+		const q = query(
+			dbREfHandler("todos"),
+			orderByChild("title"),
+			startAt(text),
+			endAt(text + "\uf8ff"),
+		);
 
-		try {
-			const response = await fetch(url);
-			checkResponseStatus(response);
-			const data = await response.json();
+		const snapshot = await get(q);
 
-			console.log(data);
+		const results = [];
 
-			setTodos(data);
-		} catch (error) {
-			console.log(error);
-		}
+		snapshot.forEach((child) => {
+			results.push({ id: child.key, ...child.val() });
+		});
+
+		setTodos(Object.entries(results));
 	};
 
 	return {
 		todos,
 		isLoading,
 		error,
-		getTodos,
 		addTodos,
 		updateTodos,
 		deleteTodos,
 		sortTodos,
-		serchTodos,
+		searchTodos,
 	};
 };

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-export const SearchTodos = ({ serchTodos }) => {
+export const SearchTodos = ({ searchTodos }) => {
 	const [value, setValue] = useState("");
 
 	const debouncedSearch = useDebouncedCallback((val) => {
-		serchTodos(val);
+		searchTodos(val);
 	}, 500);
 
 	const handleChange = ({ target }) => {
