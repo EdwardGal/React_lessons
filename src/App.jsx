@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import styles from "./app.module.css";
 import { AddTodos } from "./components/AddTodos";
 import { SearchTodos } from "./components/SearchTodos";
@@ -11,40 +10,39 @@ export const App = () => {
 		todos,
 		isLoading,
 		error,
-		getTodos,
 		addTodos,
 		updateTodos,
 		deleteTodos,
 		sortTodos,
-		serchTodos,
+		searchTodos,
 	} = useTodos();
-
-	useEffect(() => {
-		getTodos();
-	}, []);
 
 	return (
 		<>
-			{isLoading && <div className={styles.todos__loader}></div>}
 			{error && <div className={styles.todos__error}>{error}</div>}
 			<div className={styles.todos}>
 				<div className={styles.todos__actions}>
 					<AddTodos addTodos={addTodos} />
-					<SearchTodos serchTodos={serchTodos} />
+					<SearchTodos searchTodos={searchTodos} />
 					<SortedTodos sortTodos={sortTodos} />
 				</div>
-				<ul className={styles.todos__list}>
-					{todos.length
-						? todos.map((todo) => (
-								<TodoItem
-									key={todo.id}
-									{...todo}
-									updateTodos={updateTodos}
-									deleteTodos={deleteTodos}
-								/>
-							))
-						: "Список задач пуст"}
-				</ul>
+				{isLoading ? (
+					<div className={styles.todos__loader}></div>
+				) : (
+					<ul className={styles.todos__list}>
+						{todos.length
+							? todos.map(([id, { ...rest }]) => (
+									<TodoItem
+										key={id}
+										id={id}
+										{...rest}
+										updateTodos={updateTodos}
+										deleteTodos={deleteTodos}
+									/>
+								))
+							: "Список задач пуст"}
+					</ul>
+				)}
 			</div>
 		</>
 	);
