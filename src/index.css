@@ -13,3 +13,25 @@ ul,
 ol {
 	list-style: none;
 }
+
+input {
+	width: 100%;
+	padding: 5px;
+	outline: none;
+}
+
+input[type="checkbox"] {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+}
+
+button {
+	cursor: pointer;
+	padding: 5px;
+	min-width: 100px;
+}
+
+button:disabled {
+	cursor: not-allowed;
+}
