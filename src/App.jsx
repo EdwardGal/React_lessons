@@ -2,42 +2,32 @@ import styles from "./app.module.css";
 import { AddTodos } from "./components/AddTodos";
 import { SearchTodos } from "./components/SearchTodos";
 import { SortedTodos } from "./components/SortedTodos";
-import { TodoItem } from "./components/TodoItem";
+import { TodosItem } from "./components/TodosItem";
 import { useTodos } from "./hooks/use-todos";
 
 export const App = () => {
-	const {
-		todos,
-		isLoading,
-		error,
-		addTodos,
-		updateTodos,
-		deleteTodos,
-		sortTodos,
-		searchTodos,
-	} = useTodos();
+	const { todos, isLoading, error, ...actions } = useTodos();
 
 	return (
 		<>
 			{error && <div className={styles.todos__error}>{error}</div>}
 			<div className={styles.todos}>
 				<div className={styles.todos__actions}>
-					<AddTodos addTodos={addTodos} />
-					<SearchTodos searchTodos={searchTodos} />
-					<SortedTodos sortTodos={sortTodos} />
+					<AddTodos addTodos={actions.addTodos} />
+					<SearchTodos serchTodos={actions.serchTodos} />
+					<SortedTodos sortTodos={actions.sortTodos} />
 				</div>
 				{isLoading ? (
 					<div className={styles.todos__loader}></div>
 				) : (
 					<ul className={styles.todos__list}>
 						{todos.length
-							? todos.map(([id, { ...rest }]) => (
-									<TodoItem
-										key={id}
-										id={id}
-										{...rest}
-										updateTodos={updateTodos}
-										deleteTodos={deleteTodos}
+							? todos.map((todo) => (
+									<TodosItem
+										key={todo.id}
+										{...todo}
+										updateTodos={actions.updateTodos}
+										deleteTodos={actions.deleteTodos}
 									/>
 								))
 							: "Список задач пуст"}
