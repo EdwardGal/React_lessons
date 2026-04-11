@@ -14,7 +14,7 @@ export const App = () => {
 			<div className={styles.todos}>
 				<div className={styles.todos__actions}>
 					<AddTodos addTodos={actions.addTodos} />
-					<SearchTodos serchTodos={actions.serchTodos} />
+					<SearchTodos searchTodos={actions.searchTodos} />
 					<SortedTodos sortTodos={actions.sortTodos} />
 				</div>
 				{isLoading ? (
@@ -22,10 +22,11 @@ export const App = () => {
 				) : (
 					<ul className={styles.todos__list}>
 						{todos.length
-							? todos.map((todo) => (
-									<TodosItem
-										key={todo.id}
-										{...todo}
+							? todos.map(([id, { ...rest }]) => (
+									<TodoItem
+										key={id}
+										id={id}
+										{...rest}
 										updateTodos={actions.updateTodos}
 										deleteTodos={actions.deleteTodos}
 									/>
