@@ -6,25 +6,16 @@ import { TodoItem } from "./components/TodoItem";
 import { useTodos } from "./hooks/use-todos";
 
 export const App = () => {
-	const {
-		todos,
-		isLoading,
-		error,
-		addTodos,
-		updateTodos,
-		deleteTodos,
-		sortTodos,
-		searchTodos,
-	} = useTodos();
+	const { todos, isLoading, error, ...actions } = useTodos();
 
 	return (
 		<>
 			{error && <div className={styles.todos__error}>{error}</div>}
 			<div className={styles.todos}>
 				<div className={styles.todos__actions}>
-					<AddTodos addTodos={addTodos} />
-					<SearchTodos searchTodos={searchTodos} />
-					<SortedTodos sortTodos={sortTodos} />
+					<AddTodos addTodos={actions.addTodos} />
+					<SearchTodos searchTodos={actions.searchTodos} />
+					<SortedTodos sortTodos={actions.sortTodos} />
 				</div>
 				{isLoading ? (
 					<div className={styles.todos__loader}></div>
@@ -36,8 +27,8 @@ export const App = () => {
 										key={id}
 										id={id}
 										{...rest}
-										updateTodos={updateTodos}
-										deleteTodos={deleteTodos}
+										updateTodos={actions.updateTodos}
+										deleteTodos={actions.deleteTodos}
 									/>
 								))
 							: "Список задач пуст"}
