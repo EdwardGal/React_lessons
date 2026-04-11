@@ -4,8 +4,14 @@ import { SearchTodos } from "./components/SearchTodos";
 import { SortedTodos } from "./components/SortedTodos";
 import { TodosItem } from "./components/TodosItem";
 import { useTodos } from "./hooks/use-todos";
+import { AddTodos } from "./components/AddTodos";
+import { SearchTodos } from "./components/SearchTodos";
+import { SortedTodos } from "./components/SortedTodos";
+import { TodosItem } from "./components/TodosItem";
+import { useTodos } from "./hooks/use-todos";
 
 export const App = () => {
+	const { todos, isLoading, error, ...actions } = useTodos();
 	const { todos, isLoading, error, ...actions } = useTodos();
 
 	return (
