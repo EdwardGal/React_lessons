@@ -1,20 +1,4 @@
 {
-	"todos": {
-		"001": {
-			"title": "ipsa repellendus fugit nisi",
-			"completed": true
-		},
-		"002": {
-			"title": "repellendus fugit nisi",
-			"completed": false
-		},
-		"003": {
-			"title": "fugit nisi",
-			"completed": false
-		},
-		"004": {
-			"title": "fugit nisi",
-			"completed": true
-		}
-	}
+  "todos": [],
+  "$schema": "./node_modules/json-server/schema.json"
 }

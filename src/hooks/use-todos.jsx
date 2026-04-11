@@ -1,45 +1,51 @@
-import { useEffect, useState } from "react";
-import {
-	ref,
-	onValue,
-	get,
-	push,
-	update,
-	remove,
-	query,
-	orderByChild,
-	startAt,
-	endAt,
-} from "firebase/database";
-import { db } from "../firebase";
+import { useState, useEffect } from "react";
+import { BASE_URL } from "../constants";
 
-const dbREfHandler = (url) => {
-	const todosDbRef = ref(db, url);
-	return todosDbRef;
+const checkResponseStatus = async (response) => {
+	if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+	return response.json();
 };
-
-
 export const useTodos = () => {
 	const [todos, setTodos] = useState({});
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 
-	useEffect(() => {
-		return onValue(dbREfHandler("todos"), (snapshot) => {
-			const data = snapshot.val() || {};
-			const loadedTodos = Object.entries(data);
-
-			setTodos(loadedTodos);
+	const getTodos = async () => {
+		setIsLoading(true);
+		try {
+			const response = await fetch(`${BASE_URL}/todos`);
+			const data = await checkResponseStatus(response);
+			setTodos(data);
+		} catch (error) {
+			setError(error.message);
+		} finally {
 			setIsLoading(false);
 		});
 	}, []);
 
-	const addTodos = (newTodo) => {
+	useEffect(() => {
+		getTodos();
+	}, []);
+
+	const addTodos = async (newTodo) => {
 		if (!newTodo) return;
-		push(dbREfHandler("todos"), {
-			title: newTodo,
-			completed: false,
-		});
+
+		try {
+			const response = await fetch(`${BASE_URL}/todos`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					title: newTodo,
+					completed: false,
+				}),
+			});
+
+			const data = await checkResponseStatus(response);
+
+			setTodos((prev) => [...prev, data]);
+		} catch (error) {
+			setError(error.message);
+		}
 	};
 
 	const updateTodos = (id, value) => {
@@ -48,22 +54,48 @@ export const useTodos = () => {
 				? { completed: Boolean(!value) }
 				: { title: value };
 
-		update(dbREfHandler(`todos/${id}`), updatedItem);
+		try {
+			const response = await fetch(`${BASE_URL}/todos/${id}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(updatedItem),
+			});
+
+			const data = await checkResponseStatus(response);
+
+			setTodos((prev) =>
+				prev.map((todo) =>
+					todo.id === id ? { ...todo, ...data } : todo,
+				),
+			);
+		} catch (error) {
+			setError(error.message);
+		}
 	};
 
-	const deleteTodos = (id) => {
-		remove(dbREfHandler(`todos/${id}`))
+	const deleteTodos = async (id) => {
+		try {
+			const response = await fetch(`${BASE_URL}/todos/${id}`, {
+				method: "DELETE",
+			});
+
+			await checkResponseStatus(response);
+
+			setTodos((prev) => prev.filter((todo) => todo.id !== id));
+		} catch (error) {
+			setError(error.message);
+		}
 	};
 
 	const sortTodos = async () => {
-		const q = query(dbREfHandler("todos"), orderByChild("title"));
-		const snapshot = await get(q);
-		const loadedTodos = [];
-		snapshot.forEach((child) => {
-			loadedTodos.push([child.key, child.val()]);
-		});
+		try {
+			const response = await fetch(`${BASE_URL}/todos?_sort=title`);
+			const data = await checkResponseStatus(response);
 
-		setTodos(loadedTodos);
+			setTodos(data);
+		} catch (error) {
+			setError(error.message);
+		}
 	};
 
 	const searchTodos = async (text) => {
@@ -76,7 +108,9 @@ export const useTodos = () => {
 
 		const snapshot = await get(q);
 
-		const results = [];
+		try {
+			const response = await fetch(url);
+			const data = await checkResponseStatus(response);
 
 		snapshot.forEach((child) => {
 			results.push({ id: child.key, ...child.val() });

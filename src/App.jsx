@@ -2,7 +2,7 @@ import styles from "./app.module.css";
 import { AddTodos } from "./components/AddTodos";
 import { SearchTodos } from "./components/SearchTodos";
 import { SortedTodos } from "./components/SortedTodos";
-import { TodoItem } from "./components/TodoItem";
+import { TodosItem } from "./components/TodosItem";
 import { useTodos } from "./hooks/use-todos";
 
 export const App = () => {
