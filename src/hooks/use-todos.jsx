@@ -98,10 +98,12 @@ export const useTodos = () => {
 	};
 
 	const searchTodos = async (text) => {
+		let url = !text
+			? `${BASE_URL}/todos`
+			: `${BASE_URL}/todos?title=${text}`;
+
 		try {
-			const response = await fetch(
-				`${BASE_URL}/todos?title=${text}`,
-			);
+			const response = await fetch(url);
 			const data = await checkResponseStatus(response);
 			setTodos(data);
 		} catch (error) {
