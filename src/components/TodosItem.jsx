@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "../app.module.css";
 
-export const TodoItem = ({
+export const TodosItem = ({
 	id,
 	completed,
 	title,

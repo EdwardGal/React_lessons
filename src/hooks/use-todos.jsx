@@ -1,26 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BASE_URL } from "../constants";
 
-const checkResponseStatus = (response) => {
-	if (!response.ok) {
-		throw new Error(`Ошибка: ${response.status}`);
-	}
-
-	return response;
+const checkResponseStatus = async (response) => {
+	if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+	return response.json();
 };
-
 export const useTodos = () => {
 	const [todos, setTodos] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 
 	const getTodos = async () => {
+		setIsLoading(true);
 		try {
-			setIsLoading(true);
 			const response = await fetch(`${BASE_URL}/todos`);
-			checkResponseStatus(response);
-
-			const data = await response.json();
+			const data = await checkResponseStatus(response);
 			setTodos(data);
 		} catch (error) {
 			setError(error.message);
@@ -28,6 +22,10 @@ export const useTodos = () => {
 			setIsLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		getTodos();
+	}, []);
 
 	const addTodos = async (newTodo) => {
 		if (!newTodo) return;
@@ -42,9 +40,7 @@ export const useTodos = () => {
 				}),
 			});
 
-			checkResponseStatus(response);
-
-			const data = await response.json();
+			const data = await checkResponseStatus(response);
 
 			setTodos((prev) => [...prev, data]);
 		} catch (error) {
@@ -64,9 +60,8 @@ export const useTodos = () => {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(updatedItem),
 			});
-			checkResponseStatus(response);
 
-			const data = await response.json();
+			const data = await checkResponseStatus(response);
 
 			setTodos((prev) =>
 				prev.map((todo) =>
@@ -83,7 +78,8 @@ export const useTodos = () => {
 			const response = await fetch(`${BASE_URL}/todos/${id}`, {
 				method: "DELETE",
 			});
-			checkResponseStatus(response);
+
+			await checkResponseStatus(response);
 
 			setTodos((prev) => prev.filter((todo) => todo.id !== id));
 		} catch (error) {
@@ -94,9 +90,7 @@ export const useTodos = () => {
 	const sortTodos = async () => {
 		try {
 			const response = await fetch(`${BASE_URL}/todos?_sort=title`);
-			checkResponseStatus(response);
-
-			const data = await response.json();
+			const data = await checkResponseStatus(response);
 
 			setTodos(data);
 		} catch (error) {
@@ -111,8 +105,7 @@ export const useTodos = () => {
 
 		try {
 			const response = await fetch(url);
-			checkResponseStatus(response);
-			const data = await response.json();
+			const data = await checkResponseStatus(response);
 
 			console.log(data);
 
@@ -126,7 +119,6 @@ export const useTodos = () => {
 		todos,
 		isLoading,
 		error,
-		getTodos,
 		addTodos,
 		updateTodos,
 		deleteTodos,
