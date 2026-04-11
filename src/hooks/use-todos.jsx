@@ -6,8 +6,8 @@ const checkResponseStatus = async (response) => {
 	return response.json();
 };
 export const useTodos = () => {
-	const [todos, setTodos] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
+	const [todos, setTodos] = useState({});
+	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 
 	const getTodos = async () => {
@@ -20,8 +20,8 @@ export const useTodos = () => {
 			setError(error.message);
 		} finally {
 			setIsLoading(false);
-		}
-	};
+		});
+	}, []);
 
 	useEffect(() => {
 		getTodos();
@@ -48,7 +48,7 @@ export const useTodos = () => {
 		}
 	};
 
-	const updateTodos = async (id, value) => {
+	const updateTodos = (id, value) => {
 		const updatedItem =
 			typeof value === "boolean"
 				? { completed: Boolean(!value) }
@@ -98,21 +98,25 @@ export const useTodos = () => {
 		}
 	};
 
-	const serchTodos = async (query) => {
-		const url = query?.trim()
-			? `${BASE_URL}/todos?title=${query}`
-			: `${BASE_URL}/todos`;
+	const searchTodos = async (text) => {
+		const q = query(
+			dbREfHandler("todos"),
+			orderByChild("title"),
+			startAt(text),
+			endAt(text + "\uf8ff"),
+		);
+
+		const snapshot = await get(q);
 
 		try {
 			const response = await fetch(url);
 			const data = await checkResponseStatus(response);
 
-			console.log(data);
+		snapshot.forEach((child) => {
+			results.push({ id: child.key, ...child.val() });
+		});
 
-			setTodos(data);
-		} catch (error) {
-			console.log(error);
-		}
+		setTodos(Object.entries(results));
 	};
 
 	return {
@@ -123,6 +127,6 @@ export const useTodos = () => {
 		updateTodos,
 		deleteTodos,
 		sortTodos,
-		serchTodos,
+		searchTodos,
 	};
 };

@@ -8,6 +8,7 @@
 }
 
 .todos {
+	position: relative;
 	max-width: 600px;
 	width: 100%;
 	display: flex;
@@ -25,19 +26,20 @@
 	background: lightsalmon;
 }
 
-.todos__action{
+.todos__action {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 	width: 100%;
 }
 
-.todos__label{
+.todos__label {
 	font-weight: 700;
 	white-space: nowrap;
 }
 
 .todos__list {
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
@@ -46,7 +48,6 @@
 
 .todos__item {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
 	gap: 10px;
 	padding: 5px;
@@ -80,6 +81,10 @@
 }
 
 .todos__loader {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	width: 25px;
 	height: 25px;
 	border: 5px solid #303030;
