@@ -1,4 +1,20 @@
 {
-  "todos": [],
+  "todos": [
+    {
+      "title": "34",
+      "completed": false,
+      "id": "zGx1s-SQJD0"
+    },
+    {
+      "title": "gal",
+      "completed": false,
+      "id": "t7PoNa8NaTI"
+    },
+    {
+      "title": "edward",
+      "completed": false,
+      "id": "iQsIUXvMoIw"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

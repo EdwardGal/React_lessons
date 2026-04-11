@@ -5,8 +5,9 @@ const checkResponseStatus = async (response) => {
 	if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
 	return response.json();
 };
+
 export const useTodos = () => {
-	const [todos, setTodos] = useState({});
+	const [todos, setTodos] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 
@@ -20,8 +21,8 @@ export const useTodos = () => {
 			setError(error.message);
 		} finally {
 			setIsLoading(false);
-		});
-	}, []);
+		}
+	};
 
 	useEffect(() => {
 		getTodos();
@@ -41,17 +42,16 @@ export const useTodos = () => {
 			});
 
 			const data = await checkResponseStatus(response);
-
 			setTodos((prev) => [...prev, data]);
 		} catch (error) {
 			setError(error.message);
 		}
 	};
 
-	const updateTodos = (id, value) => {
+	const updateTodos = async (id, value) => {
 		const updatedItem =
 			typeof value === "boolean"
-				? { completed: Boolean(!value) }
+				? { completed: !value }
 				: { title: value };
 
 		try {
@@ -91,7 +91,6 @@ export const useTodos = () => {
 		try {
 			const response = await fetch(`${BASE_URL}/todos?_sort=title`);
 			const data = await checkResponseStatus(response);
-
 			setTodos(data);
 		} catch (error) {
 			setError(error.message);
@@ -99,24 +98,17 @@ export const useTodos = () => {
 	};
 
 	const searchTodos = async (text) => {
-		const q = query(
-			dbREfHandler("todos"),
-			orderByChild("title"),
-			startAt(text),
-			endAt(text + "\uf8ff"),
-		);
-
-		const snapshot = await get(q);
+		let url = !text
+			? `${BASE_URL}/todos`
+			: `${BASE_URL}/todos?title=${text}`;
 
 		try {
 			const response = await fetch(url);
 			const data = await checkResponseStatus(response);
-
-		snapshot.forEach((child) => {
-			results.push({ id: child.key, ...child.val() });
-		});
-
-		setTodos(Object.entries(results));
+			setTodos(data);
+		} catch (error) {
+			setError(error.message);
+		}
 	};
 
 	return {
