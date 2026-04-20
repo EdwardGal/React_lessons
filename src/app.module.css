@@ -56,22 +56,11 @@
 .todos__title {
 	flex: 1 1 auto;
 	padding: 5px;
+	overflow: hidden;
 }
 
 .todos__checkbox {
 	flex-shrink: 0;
-}
-
-.todos__item:not(.todos__item_completed):hover {
-	background: lightblue;
-}
-
-.todos__item:not(.todos__item_completed):hover .todos__title {
-	outline: 1px solid black;
-}
-
-.todos__item_completed .todos__title {
-	text-decoration: line-through;
 }
 
 .todos__error {

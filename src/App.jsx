@@ -1,34 +1,65 @@
+import { useEffect, useState } from "react";
 import styles from "./app.module.css";
-import { AddTodos } from "./components/AddTodos";
-import { SearchTodos } from "./components/SearchTodos";
-import { SortedTodos } from "./components/SortedTodos";
-import { TodosItem } from "./components/TodosItem";
-import { useTodos } from "./hooks/use-todos";
+import { ControlPanel, Todo } from "./components";
+import { createTodos, readTodos, updateTodos, deleteTodos } from "./api";
+import { addTodo, saveTodo, deleteTodo } from "./utils";
 
 export const App = () => {
-	const { todos, isLoading, error, ...actions } = useTodos();
+	const [todos, setTodos] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [searchPhrase, setSearchPhrase] = useState("");
+	const [isAlphabetSorting, setIsAlphabetSorting] = useState(false);
+
+	useEffect(() => {
+		setIsLoading(false);
+		readTodos()
+			.then((data) => setTodos(data))
+			.catch((error) => setError(error.message))
+			.finally(() => setIsLoading(false));
+	}, []);
+
+	const onCreateTodos = (newTodo) => {
+		createTodos(newTodo).then((data) => setTodos(addTodo(todos, data)));
+	};
+
+	const onUpdateTodos = (updatedTodo) => {
+		updateTodos(updatedTodo).then((data) =>
+			setTodos(saveTodo(todos, data)),
+		);
+	};
+
+	const onDeleteTodos = (id) => {
+		deleteTodos(id).then(() => setTodos(deleteTodo(todos, id)));
+	};
+
+	useEffect(() => {
+		readTodos(searchPhrase, isAlphabetSorting).then((loadedTodos) =>
+			setTodos(loadedTodos),
+		);
+	}, [searchPhrase, isAlphabetSorting]);
 
 	return (
 		<>
 			{error && <div className={styles.todos__error}>{error}</div>}
 			<div className={styles.todos}>
-				<div className={styles.todos__actions}>
-					<AddTodos addTodos={actions.addTodos} />
-					<SearchTodos searchTodos={actions.searchTodos} />
-					<SortedTodos sortTodos={actions.sortTodos} />
-				</div>
+				<ControlPanel
+					onCreate={onCreateTodos}
+					onSearch={setSearchPhrase}
+					onSorting={setIsAlphabetSorting}
+				/>
 				{isLoading ? (
 					<div className={styles.todos__loader}></div>
 				) : (
 					<ul className={styles.todos__list}>
 						{todos.length
-							? todos.map(([id, { ...rest }]) => (
-									<TodoItem
+							? todos.map(({ id, ...rest }) => (
+									<Todo
 										key={id}
-										id={id}
 										{...rest}
-										updateTodos={actions.updateTodos}
-										deleteTodos={actions.deleteTodos}
+										id={id}
+										onUpdate={onUpdateTodos}
+										onDelete={onDeleteTodos}
 									/>
 								))
 							: "Список задач пуст"}

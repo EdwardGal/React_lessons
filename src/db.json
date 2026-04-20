@@ -1,19 +1,19 @@
 {
   "todos": [
     {
-      "title": "34",
+      "title": "13123",
       "completed": false,
-      "id": "zGx1s-SQJD0"
+      "id": 1
     },
     {
-      "title": "gal",
+      "title": "3",
       "completed": false,
-      "id": "t7PoNa8NaTI"
+      "id": 2
     },
     {
-      "title": "edward",
-      "completed": false,
-      "id": "iQsIUXvMoIw"
+      "title": "a",
+      "completed": true,
+      "id": 3
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
