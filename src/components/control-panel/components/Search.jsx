@@ -13,7 +13,7 @@ export const Search = ({ onSearch }) => {
 
 	return (
 		<input
-			type="text"
+			type="search"
 			value={value}
 			placeholder="Поиск..."
 			onChange={onChange}

@@ -7,11 +7,15 @@ const fetchData = (method, { id, ...payload } = {}) => {
 		headers: { "Content-Type": "application/json" },
 	};
 
-	if (method === HTTP_METHOD.GET) {
+	if (method === HTTP_METHOD.GET && id) {
+		url += `/${id}`;
+	} else if (method === HTTP_METHOD.GET) {
 		const { searchPhrase, isAlphabetSorting } = payload;
+
 		const sortingParams = isAlphabetSorting
 			? "_sort=title&_order=asc"
 			: "_sort=id&_order=desc";
+
 		url += `?${sortingParams}&title_like=${searchPhrase}`;
 	} else {
 		if (method !== HTTP_METHOD.POST) {
@@ -23,7 +27,12 @@ const fetchData = (method, { id, ...payload } = {}) => {
 		}
 	}
 
-	return fetch(url, options).then((response) => response.json());
+	return fetch(url, options).then((response) => {
+		if (!response.ok) {
+			throw new Error(`HTTP error: ${response.status}`);
+		}
+		return response.json();
+	});
 };
 
 export const createTodos = (newTodo) => fetchData("POST", newTodo);
@@ -31,3 +40,4 @@ export const readTodos = (searchPhrase = "", isAlphabetSorting = false) =>
 	fetchData("GET", { searchPhrase, isAlphabetSorting });
 export const updateTodos = (updatedTodo) => fetchData("PATCH", updatedTodo);
 export const deleteTodos = (id) => fetchData("DELETE", { id });
+export const getTodo = (id) => fetchData("GET", { id });

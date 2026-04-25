@@ -1,4 +1,4 @@
-import styles from "../../app.module.css";
+import styles from "../../app.module.scss";
 
 export const Button = ({ children, onClick }) => {
 	return (
