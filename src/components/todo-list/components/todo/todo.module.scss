@@ -1,0 +1,13 @@
+.todo {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	justify-content: space-between;
+	&__title {
+		flex: 1 1 auto;
+		padding: 5px;
+	}
+	&__checkbox {
+		flex-shrink: 0;
+	}
+}

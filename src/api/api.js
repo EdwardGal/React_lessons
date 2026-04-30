@@ -23,7 +23,12 @@ const fetchData = (method, { id, ...payload } = {}) => {
 		}
 	}
 
-	return fetch(url, options).then((response) => response.json());
+	return fetch(url, options).then((response) => {
+		if (!response.ok) {
+			throw new Error(`Ошибка: ${response.status}`);
+		}
+		return response.json();
+	});
 };
 
 export const createTodos = (newTodo) => fetchData("POST", newTodo);

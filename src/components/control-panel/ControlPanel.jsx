@@ -1,15 +1,12 @@
+import { CreateTodo, SearchTodo, SortTodo } from "./components";
 import styles from "./controlpanel.module.scss";
-import { Button } from "../button/button";
-import { Search, Sorting, Create } from "./components";
 
-
-
-export const ControlPanel = ({ onCreate, onSearch, onSorting }) => {
+export const ControlPanel = () => {
 	return (
-		<div className={styles.todos__actions}>
-			<Search onSearch={onSearch} />
-			<Sorting onSorting={onSorting} />
-			<Create onCreate={onCreate} />
+		<div className={styles["todos__control-panel"]}>
+			<SearchTodo />
+			<SortTodo />
+			<CreateTodo />
 		</div>
 	);
 };

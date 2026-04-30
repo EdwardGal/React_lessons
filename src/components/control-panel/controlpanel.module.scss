@@ -1,7 +1,18 @@
-.todos__actions{
+.todos__control-panel {
+	width: 100%;
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 10px;
-	padding: 20px;
-	background: lightpink;
+	padding: 10px;
+	background: var(--color-white);
+	&-input {
+		display: flex;
+		gap: 10px;
+		padding: 5px;
+		background: var(--color-black);
+		&_search {
+			flex: 1 1 auto;
+		}
+	}
 }
